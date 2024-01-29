@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+    kafka:
+        image: docker.io/bitnami/kafka:latest
+        ports:
+            - '9092:9092'
+            - '19092:19092'
+        container_name: kafka
+        environment:
+            - KAFKA_KRAFT_CLUSTER_ID=r4zt_wrqTRuT7W2NJsB_GA
+            - KAFKA_BROKER_ID=1
+            - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:19092
+            - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:19092
+            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+            - KAFKA_CFG_NODE_ID=1
+            - ALLOW_PLAINTEXT_LISTENER=yes
+    kafkadrop:
+        image: obsidiandynamics/kafdrop:latest
+        ports:
+            - "9000:9000"
+        depends_on:
+            - kafka
+        environment:
+            - KAFKA_BROKERCONNECT=kafka:9092
+            - JVM_OPTS=-Xms32M -Xmx64M
+            - SERVER_SERVLET_CONTEXTPATH=/
