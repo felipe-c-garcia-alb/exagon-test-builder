@@ -8,17 +8,18 @@ fi
 
 dockerfile_us=$1
 envfile=$2
-scale=$3
+token=$3
+scale=$4
 
 cd ../../Participant/ || exit 1
 
-sh build-image.sh "alticelabsprojects" "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"
+sh build-image.sh "alticelabsprojects" "$token"
 
 cd ../test/shellscript/ || exit 1
 
 cd ../../ms-tester/ || exit 1
 
-sh build-image.sh "alticelabsprojects" "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"
+sh build-image.sh "alticelabsprojects" "$token"
 
 cd ../test/shellscript/ || exit 1
 
