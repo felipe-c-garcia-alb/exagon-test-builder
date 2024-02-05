@@ -8,14 +8,16 @@
 
 dockerpath_env="../docker/docker-compose.yml"
 envfile="../docker/orchestrator/environments/orch.env"
-podname="provisioning-orchestrator"
+podname="orchestrator"
 token=$1
+orchnum=2
+podnum=2
 #initialRequestsPath="../config/initialrequests.txt"
 #finalRequestsPath="../config/finalrequests.txt"
 
 
 printf "Step 1: Build enviroment!\\n"
-sh build-enviroment.sh "$dockerpath_env" "$envfile" "$token" "--scale orchestrator=2"
+sh build-enviroment.sh "$dockerpath_env" "$envfile" "$token" "--scale ${podname}=${podnum}"
 RETURN=$?
 
 if [ $RETURN -eq 0 ];
@@ -30,7 +32,7 @@ fi
 sleep 10
 
 printf "Step 2: Assert system healty\\n"
-sh assertHealthy.sh "$podname" "2"
+sh assertHealthy.sh "$podname" "$podnum"
 RETURN=$?
 
 if [ $RETURN -eq 0 ];
@@ -43,7 +45,7 @@ else
 fi
 
 printf "Step 3: Send Requests\\n"
-sh sendRequests.sh "2"
+sh sendRequests.sh "$orchnum"
 RETURN=$?
 if [ $RETURN -eq 0 ];
 then
@@ -51,6 +53,18 @@ then
 else
   sh destroy-enviroment.sh "$dockerpath_env" "$envfile"
   printf "The script sendRequests.sh was NOT executed successfuly and returned the code %s \\n" $RETURN
+  exit $RETURN
+fi
+
+printf "Step 4: Collect Logs\\n"
+sh collect-logs.sh "$podname" "$podnum"
+RETURN=$?
+if [ $RETURN -eq 0 ];
+then
+  printf "The script collect-logs.sh was executed successfuly\\n"
+else
+  sh destroy-enviroment.sh "$dockerpath_env" "$envfile"
+  printf "The script collect-logs.sh was NOT executed successfuly and returned the code %s \\n" $RETURN
   exit $RETURN
 fi
 
