@@ -7,8 +7,10 @@
         <option value="$PROJECT_DIR$/../../core/Orchestrator-Teste/Participant/pom.xml" />
         <option value="$PROJECT_DIR$/Participant/pom.xml" />
         <option value="$PROJECT_DIR$/../../core/Orchestrator-Teste/ms-tester/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-tester/pom.xml" />
       </list>
     </option>
+    <option name="workspaceImportForciblyTurnedOn" value="true" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="corretto-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
