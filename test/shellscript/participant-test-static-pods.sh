@@ -6,15 +6,16 @@
 #  exit 1
 #fi
 
-dockerpath_env="../docker/docker-compose-orch.yml"
+dockerpath_env="../docker/docker-compose.yml"
 envfile="../docker/orchestrator/environments/.env"
-podname="provisioning-orchestrator"
+podname="provisioning-participant"
+token=$1
 #initialRequestsPath="../config/initialrequests.txt"
 #finalRequestsPath="../config/finalrequests.txt"
 
 
 printf "Step 1: Build enviroment!\\n"
-sh build-enviroment.sh "$dockerpath_env"  "$envfile"
+sh build-enviroment.sh "$dockerpath_env" "$envfile" "$token" "--scale participant=2"
 RETURN=$?
 
 if [ $RETURN -eq 0 ];
@@ -29,7 +30,7 @@ fi
 sleep 10
 
 printf "Step 2: Assert system healty\\n"
-sh assertHealthy.sh "$podname" "1"
+sh assertHealthy.sh "$podname" "2"
 RETURN=$?
 
 if [ $RETURN -eq 0 ];
@@ -42,7 +43,7 @@ else
 fi
 
 printf "Step 3: Send Requests\\n"
-sh sendRequests.sh
+sh sendRequests.sh "1"
 RETURN=$?
 if [ $RETURN -eq 0 ];
 then

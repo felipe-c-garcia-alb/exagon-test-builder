@@ -30,7 +30,7 @@ services:
             - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
             - KAFKA_CFG_NODE_ID=1
             - ALLOW_PLAINTEXT_LISTENER=yes
-            - KAFKA_NUM_PARTITIONS=10
+            - KAFKA_NUM_PARTITIONS=4
             - KAFKA_MESSAGE_MAX_BYTES=10485880
     kafkadrop:
         image: obsidiandynamics/kafdrop:latest
@@ -91,8 +91,15 @@ services:
             EXAGON_REDIS_SERVERS: ${EXAGON_REDIS_SERVERS}
             EXAGON_REDIS_PORT: ${EXAGON_REDIS_PORT}
             EXAGON_REDIS_TTL: ${EXAGON_REDIS_TTL}
+        healthcheck:
+            test: [ "CMD", "touch", "/tmp/ready" ]
+            interval: 60s
+            retries: 5
+            start_period: 10s
+            timeout: 10s
         depends_on:
             - kafkadrop
+        restart: unless-stopped
     mock-participants:
         image: kafka-mock-participants
         container_name: mock-participant

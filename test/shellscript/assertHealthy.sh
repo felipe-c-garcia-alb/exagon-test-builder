@@ -10,6 +10,7 @@ a=0
 
 while [ $a -lt 20 ]
 do
+
   a=$(( a + 1 ))
   if [ "$(docker ps -f "health=healthy" | grep "$1" | wc -l)" = "$2" ] ; then
       printf "All Pods are Healthy \\n"
