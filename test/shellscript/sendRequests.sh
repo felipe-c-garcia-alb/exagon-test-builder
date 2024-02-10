@@ -2,8 +2,9 @@
 
 sleep 5
 
-if [ -z "$1" ]; then
-  docker run -it --rm --network=host ms-tester "1"
+if [ $# -lt 3 ]; then
+  docker run -i --rm --network=host ms-tester "1" "1000" "50"
 else
-  docker run -it --rm --network=host ms-tester "$1"
+  docker run -i --rm --network=host ms-tester "$1" "$2" "$3"
 fi
+

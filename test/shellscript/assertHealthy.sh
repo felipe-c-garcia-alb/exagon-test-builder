@@ -5,7 +5,6 @@ if [ $# -lt 2 ]; then
   return 1 2>/dev/null
   exit 1
 fi
-
 a=0
 
 while [ $a -lt 20 ]

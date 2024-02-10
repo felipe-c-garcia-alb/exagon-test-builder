@@ -45,7 +45,7 @@ else
 fi
 
 printf "Step 3: Send Requests\\n"
-sh sendRequests.sh "$orchnum"
+sh sendRequests.sh "$orchnum" "1000" "50"
 RETURN=$?
 if [ $RETURN -eq 0 ];
 then

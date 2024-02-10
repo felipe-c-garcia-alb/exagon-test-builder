@@ -17,9 +17,11 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+        final Arguments arguments = new Arguments(args[0], args[1], args[2]);
         // Send request
         Map<Integer, Integer> responseCodes = new HashMap<>();
-        System.out.println(Arrays.toString(buildPorts(args[0])));
+        System.out.println(Arrays.toString(buildPorts(arguments.portNum)));
+
         SendRequests sendRequests = new SendRequests(BodyGenerator.PCF_ACCOUNT,
                 buildPorts(args[0]),
                 "/account",
@@ -27,18 +29,18 @@ public class Main {
                 10);
         sendRequests.run();
         sleep(1000);
+
         sendRequests.clearRequests();
+
         sendRequests = new SendRequests(BodyGenerator.PCF_ACCOUNT,
                 buildPorts(args[0]),
                 "/account",
-                2000,
-                50);
+                arguments.returnRequestNum(),
+                arguments.returnRate());
         sendRequests.run();
-        sleep(5000);
+        sleep(40000);
         List<Future<HttpResponse<String>>> listAnswers = sendRequests.getListAnswers();
         int timeout = 0;
-        List<String[]> dataLines = new ArrayList<>();
-        dataLines.add(new String[] {"RequestBody; Response Body; statusCode"});
         for (Future<HttpResponse<String>> future : listAnswers) {
             int status = 0;
             if (future.isDone()) {
@@ -52,7 +54,7 @@ public class Main {
             responseCodes.compute(status, (k, v) -> (v == null) ? 1 : v+1);
         }
         System.out.println("Total de pedidos: " + listAnswers.size()
-                + "\nPedidos com erro de particionamento: " + timeout);
+                + "\nPedidos sem resposta: " + timeout);
         sendRequests.clearRequests();
         responseCodes.forEach((k,v) -> System.out.println("Status code:" + k + " - Quantidade: " + v));
     }
@@ -67,4 +69,23 @@ public class Main {
         }
         return list.toArray(new String[0]);
     }
+
+    private record Arguments(String portNum, String requestNum, String rate){
+
+        public int returnRequestNum(){
+            return Integer.parseInt(requestNum);
+        }
+
+        public int returnRate(){
+            return Integer.parseInt(rate);
+        }
+        @Override
+        public String toString() {
+            return "Arguments{" +
+                    "portNum='" + portNum + '\'' +
+                    ", requestNum='" + requestNum + '\'' +
+                    ", rate='" + rate + '\'' +
+                    '}';
+        }
+    };
 }

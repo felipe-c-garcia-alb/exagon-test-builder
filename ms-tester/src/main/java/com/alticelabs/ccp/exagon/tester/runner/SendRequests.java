@@ -59,7 +59,7 @@ public class SendRequests implements Runnable {
                     .uri(URI.create("http://localhost:"+port+endpoint))
                     .POST(HttpRequest.BodyPublishers.ofString(values))
                     .build();
-            long miliPreTime = System.currentTimeMillis();
+            final long miliPreTime = System.currentTimeMillis();
             listAnswers.add(client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
                 System.out.println("Status code: " + response.statusCode()
                         + " - listAnswer size: " + listAnswers.size()
