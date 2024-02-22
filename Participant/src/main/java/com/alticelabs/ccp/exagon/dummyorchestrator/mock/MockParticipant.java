@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class MockParticipant {
@@ -44,43 +46,49 @@ public class MockParticipant {
     }
 
     private void consumerStartConsuming(IExagonCommunicationConsumer consumer) {
+        ExecutorService service = Executors.newCachedThreadPool();
         (new Thread(() -> {
             while (true) {
                 Event event = consumer.getNext();
                 if (event != null) {
-                    final ParticipantContext participantContext = buildParticipantContext(event);
+                    service.execute(() -> processEvent(event));
 //                    try {
 //                        Thread.sleep(500);
 //                    } catch (InterruptedException e) {
 //                        throw new RuntimeException(e);
 //                    }
-                    if (event.getPayload() instanceof ManageServiceReferences) {
-                        try {
-                            createManageServiceReferencesResult(participantContext);
-                            createManageServiceReferencesFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (event.getPayload() instanceof GeneratePRVLDR) {
-                        try {
-                            createGeneratePRVLDRResult(participantContext);
-                            createGeneratePRVLDRFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (event.getPayload() instanceof PublishADR) {
-                        try {
-                            createPublishADRResult(participantContext);
-                            createPublishADRFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+
                 }
             }
         })).start();
     }
 
+
+    private void processEvent(Event event){
+        final ParticipantContext participantContext = buildParticipantContext(event);
+        if (event.getPayload() instanceof ManageServiceReferences) {
+            try {
+                createManageServiceReferencesResult(participantContext);
+                createManageServiceReferencesFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (event.getPayload() instanceof GeneratePRVLDR) {
+            try {
+                createGeneratePRVLDRResult(participantContext);
+                createGeneratePRVLDRFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (event.getPayload() instanceof PublishADR) {
+            try {
+                createPublishADRResult(participantContext);
+                createPublishADRFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     private ParticipantContext buildParticipantContext(Event event) {
         String sagaId = event.getSagaId();
         String statusAddress = event.getHeaders().get(STATUS_ADDRESS);

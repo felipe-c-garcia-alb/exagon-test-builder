@@ -8,10 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static com.alticelabs.ccp.exagon.tester.util.PortConfig.getPort;
@@ -61,9 +58,14 @@ public class SendRequests implements Runnable {
                     .build();
             final long miliPreTime = System.currentTimeMillis();
             listAnswers.add(client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
+                final long curTimeMili = System.currentTimeMillis();
+                Date curTimeDate = new Date(curTimeMili);
                 System.out.println("Status code: " + response.statusCode()
                         + " - listAnswer size: " + listAnswers.size()
-                        + " - Time Elapsed: "+ (System.currentTimeMillis() - miliPreTime));
+                        + " - Time Elapsed: "+ (curTimeMili - miliPreTime));
+                if((curTimeMili - miliPreTime) > 20000) System.out.println(response.headers()
+                        + "\n" + response.body()
+                        + "\n" + curTimeDate.toString());
                 return response;
             }));
             try {

@@ -77,6 +77,9 @@ services:
             timeout: 10s
         depends_on:
             - kafkadrop
+        stop_signal: SIGINT
+        stop_grace_period: 20s
+
     participant:
         image: ${PCF_PROVISIONING_PARTICIPANT_IMAGE}
         hostname: pcf-provisioning-participant
@@ -100,6 +103,8 @@ services:
         depends_on:
             - kafkadrop
         restart: unless-stopped
+        stop_signal: SIGINT
+
     mock-participants:
         image: kafka-mock-participants
         container_name: mock-participant

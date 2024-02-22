@@ -25,10 +25,10 @@ public class Main {
         SendRequests sendRequests = new SendRequests(BodyGenerator.PCF_ACCOUNT,
                 buildPorts(args[0]),
                 "/account",
-                100,
-                10);
+                300,
+                100);
         sendRequests.run();
-        sleep(1000);
+        sleep(5000);
 
         sendRequests.clearRequests();
 
@@ -38,7 +38,7 @@ public class Main {
                 arguments.returnRequestNum(),
                 arguments.returnRate());
         sendRequests.run();
-        sleep(40000);
+        sleep(60000);
         List<Future<HttpResponse<String>>> listAnswers = sendRequests.getListAnswers();
         int timeout = 0;
         for (Future<HttpResponse<String>> future : listAnswers) {

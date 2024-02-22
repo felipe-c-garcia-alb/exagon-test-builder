@@ -53,11 +53,11 @@ services:
             timeout: 30s
             retries: 30
     nginx:
-        build:
-            context: .
-            dockerfile: ./nginx/Dockerfile
+        image: nginx:1.15-alpine
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
         ports:
-            - "8080:8080"
+            - 8080:8080
         depends_on:
              - orchestrator
 
@@ -81,12 +81,12 @@ services:
         healthcheck:
             test: [ "CMD", "touch", "/tmp/ready" ]
             interval: 60s
-            retries: 5
+            retries: 1
             start_period: 10s
             timeout: 10s
         depends_on:
             - kafkadrop
-
+        stop_signal: SIGINT
     participant:
         image: ${PCF_PROVISIONING_PARTICIPANT_IMAGE}
         hostname: pcf-provisioning-participant
@@ -109,7 +109,7 @@ services:
             timeout: 10s
         depends_on:
             - kafkadrop
-        restart: unless-stopped
+        stop_signal: SIGINT
     mock-participants:
         image: kafka-mock-participants
         container_name: mock-participant
