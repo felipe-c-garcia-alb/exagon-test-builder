@@ -70,8 +70,8 @@ services:
         ports:
             - "${OUTSIDE_HTTP_SERVER_PORT}:${EXAGON_HTTP_SERVER_PORT}"
         healthcheck:
-            test: [ "CMD", "touch", "/tmp/ready" ]
-            interval: 60s
+            test: [ "CMD", "ls", "/tmp/ready" ]
+            interval: 10s
             retries: 5
             start_period: 10s
             timeout: 10s
@@ -95,14 +95,13 @@ services:
             EXAGON_REDIS_PORT: ${EXAGON_REDIS_PORT}
             EXAGON_REDIS_TTL: ${EXAGON_REDIS_TTL}
         healthcheck:
-            test: [ "CMD", "touch", "/tmp/ready" ]
-            interval: 60s
+            test: [ "CMD", "ls", "/tmp/ready" ]
+            interval: 10s
             retries: 5
             start_period: 10s
             timeout: 10s
         depends_on:
             - kafkadrop
-        restart: unless-stopped
         stop_signal: SIGINT
 
     mock-participants:

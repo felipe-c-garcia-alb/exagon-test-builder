@@ -25,8 +25,8 @@ public class Main {
         SendRequests sendRequests = new SendRequests(BodyGenerator.PCF_ACCOUNT,
                 buildPorts(args[0]),
                 "/account",
-                300,
-                100);
+                100,
+                200);
         sendRequests.run();
         sleep(5000);
 

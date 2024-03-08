@@ -87,6 +87,7 @@ services:
         depends_on:
             - kafkadrop
         stop_signal: SIGINT
+
     participant:
         image: ${PCF_PROVISIONING_PARTICIPANT_IMAGE}
         hostname: pcf-provisioning-participant
@@ -110,6 +111,7 @@ services:
         depends_on:
             - kafkadrop
         stop_signal: SIGINT
+
     mock-participants:
         image: kafka-mock-participants
         container_name: mock-participant
