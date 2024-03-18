@@ -5,8 +5,12 @@ public class ParticipantContext {
     private final String sagaId;
     private final String statusAddress;
     private final String stepIdentifier;
-    private final String readTimestamp;
-    private final String writeTimestamp;
+    private final String tsRead;
+    private final String tsWrite;
+
+
+
+    private final String tsReference;
 
     private final String qualifier;
 
@@ -14,9 +18,10 @@ public class ParticipantContext {
         sagaId = builder.sagaId;
         statusAddress = builder.statusAddress;
         stepIdentifier = builder.stepIdentifier;
-        readTimestamp = builder.readTimestamp;
-        writeTimestamp = builder.writeTimestamp;
+        tsRead = builder.tsRead;
+        tsWrite = builder.tsWrite;
         qualifier = builder.qualifier;
+        tsReference = builder.tsReference;
     }
 
     public static Builder builder() {
@@ -28,8 +33,9 @@ public class ParticipantContext {
         builder.sagaId = copy.getSagaId();
         builder.statusAddress = copy.getStatusAddress();
         builder.stepIdentifier = copy.getStepIdentifier();
-        builder.readTimestamp = copy.getReadTimestamp();
-        builder.writeTimestamp = copy.getWriteTimestamp();
+        builder.tsRead = copy.getTsRead();
+        builder.tsReference = copy.getTsReference();
+        builder.tsWrite = copy.getTsWrite();
         builder.qualifier = copy.getQualifier();
         return builder;
     }
@@ -46,15 +52,18 @@ public class ParticipantContext {
         return stepIdentifier;
     }
 
-    public String getReadTimestamp() {
-        return readTimestamp;
+    public String getTsRead() {
+        return tsRead;
     }
 
-    public String getWriteTimestamp() {
-        return writeTimestamp;
+    public String getTsWrite() {
+        return tsWrite;
     }
     public String getQualifier() {
         return qualifier;
+    }
+    public String getTsReference() {
+        return tsReference;
     }
 
 
@@ -65,8 +74,9 @@ public class ParticipantContext {
         private String sagaId;
         private String statusAddress;
         private String stepIdentifier;
-        private String readTimestamp;
-        private String writeTimestamp;
+        private String tsRead;
+        private String tsReference;
+        private String tsWrite;
 
         private String qualifier;
 
@@ -112,8 +122,8 @@ public class ParticipantContext {
          * @param readTimestamp the {@code readTimestamp} to set
          * @return a reference to this Builder
          */
-        public Builder readTimestamp(String readTimestamp) {
-            this.readTimestamp = readTimestamp;
+        public Builder tsRead(String readTimestamp) {
+            this.tsRead = readTimestamp;
             return this;
         }
 
@@ -123,8 +133,12 @@ public class ParticipantContext {
          * @param writeTimestamp the {@code writeTimestamp} to set
          * @return a reference to this Builder
          */
-        public Builder writeTimestamp(String writeTimestamp) {
-            this.writeTimestamp = writeTimestamp;
+        public Builder tsWrite(String writeTimestamp) {
+            this.tsWrite = writeTimestamp;
+            return this;
+        }
+        public Builder tsReference(String tsReference) {
+            this.tsReference = tsReference;
             return this;
         }
 

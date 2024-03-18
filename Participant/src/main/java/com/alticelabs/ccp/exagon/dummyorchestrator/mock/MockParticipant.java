@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class MockParticipant {
@@ -25,8 +27,9 @@ public class MockParticipant {
     private IExagonCommunicationConsumer consumer;
     private static final String STATUS_ADDRESS = "statusAddress";
     private static final String STEP_IDENTIFIER = "stepIdentifier";
-    private static final String READ_TIMESTAMP = "readTimestamp";
-    private static final String WRITE_TIMESTAMP = "writeTimestamp";
+    private static final String READ_TIMESTAMP = "tsRead";
+    private static final String WRITE_TIMESTAMP = "tsWrite";
+    private static final String REFERENCE_TIMESTAMP = "tsReference";
     private static final String QUALIFIER = "qualifier";
 
     @Bean
@@ -44,57 +47,65 @@ public class MockParticipant {
     }
 
     private void consumerStartConsuming(IExagonCommunicationConsumer consumer) {
+        ExecutorService service = Executors.newCachedThreadPool();
         (new Thread(() -> {
             while (true) {
                 Event event = consumer.getNext();
                 if (event != null) {
-                    final ParticipantContext participantContext = buildParticipantContext(event);
+                    service.execute(() -> processEvent(event));
 //                    try {
 //                        Thread.sleep(500);
 //                    } catch (InterruptedException e) {
 //                        throw new RuntimeException(e);
 //                    }
-                    if (event.getPayload() instanceof ManageServiceReferences) {
-                        try {
-                            createManageServiceReferencesResult(participantContext);
-                            createManageServiceReferencesFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (event.getPayload() instanceof GeneratePRVLDR) {
-                        try {
-                            createGeneratePRVLDRResult(participantContext);
-                            createGeneratePRVLDRFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (event.getPayload() instanceof PublishADR) {
-                        try {
-                            createPublishADRResult(participantContext);
-                            createPublishADRFlow(participantContext);
-                        } catch (ExagonCommunicationProducerException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+
                 }
             }
         })).start();
     }
 
+
+    private void processEvent(Event event){
+        final ParticipantContext participantContext = buildParticipantContext(event);
+        if (event.getPayload() instanceof ManageServiceReferences) {
+            try {
+                createManageServiceReferencesResult(participantContext);
+                createManageServiceReferencesFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (event.getPayload() instanceof GeneratePRVLDR) {
+            try {
+                createGeneratePRVLDRResult(participantContext);
+                createGeneratePRVLDRFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (event.getPayload() instanceof PublishADR) {
+            try {
+                createPublishADRResult(participantContext);
+                createPublishADRFlow(participantContext);
+            } catch (ExagonCommunicationProducerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     private ParticipantContext buildParticipantContext(Event event) {
         String sagaId = event.getSagaId();
         String statusAddress = event.getHeaders().get(STATUS_ADDRESS);
         String stepIdentifier = event.getHeaders().get(STEP_IDENTIFIER);
         String readTimestamp = event.getHeaders().get(READ_TIMESTAMP);
         String writeTimestamp = event.getHeaders().get(WRITE_TIMESTAMP);
+        String referenceTimestamp = event.getHeaders().get(REFERENCE_TIMESTAMP);
         String qualifier = event.getHeaders().getOrDefault(QUALIFIER, "none");
 
         return ParticipantContext.builder()
                 .sagaId(sagaId)
                 .statusAddress(statusAddress)
                 .stepIdentifier(stepIdentifier)
-                .readTimestamp(readTimestamp)
-                .writeTimestamp(writeTimestamp)
+                .tsRead(readTimestamp)
+                .tsWrite(writeTimestamp)
+                .tsReference(referenceTimestamp)
                 .qualifier(qualifier)
                 .build();
     }
@@ -144,10 +155,11 @@ public class MockParticipant {
     }
 
     private void addAllHeaders(Event event, ParticipantContext participantContext) {
-        event.addHeader(READ_TIMESTAMP, participantContext.getReadTimestamp());
-        event.addHeader(WRITE_TIMESTAMP, participantContext.getWriteTimestamp());
+        event.addHeader(READ_TIMESTAMP, participantContext.getTsRead());
+        event.addHeader(WRITE_TIMESTAMP, participantContext.getTsWrite());
         event.addHeader(STATUS_ADDRESS, participantContext.getStatusAddress());
         event.addHeader(STEP_IDENTIFIER, participantContext.getStepIdentifier());
+        event.addHeader(REFERENCE_TIMESTAMP, participantContext.getTsReference());
         event.addHeader(QUALIFIER, participantContext.getQualifier());
     }
 
